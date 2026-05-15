@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>yt-dlp Command Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f0f0f;
+      --surface: #1a1a1a;
+      --surface2: #222;
+      --border: #2e2e2e;
+      --border2: #3a3a3a;
+      --text: #f0f0f0;
+      --muted: #888;
+      --accent: #e8ff47;
+      --accent-dim: rgba(232,255,71,0.12);
+      --red: #ff4d4d;
+      --green: #4dffaa;
+      --radius: 10px;
+      --mono: 'JetBrains Mono', monospace;
+      --sans: 'DM Sans', sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 15px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 3rem 1rem 4rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 720px;
+    }
+
+    header {
+      margin-bottom: 2.5rem;
+    }
+
+    .badge {
+      display: inline-block;
+      background: var(--accent-dim);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 4px;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 600;
+      line-height: 1.2;
+      color: var(--text);
+    }
+
+    h1 span { color: var(--accent); }
+
+    .subtitle {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+      margin-bottom: 10px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    input[type="text"], select {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 14px;
+      padding: 9px 12px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    input[type="text"]:focus, select:focus {
+      border-color: var(--accent);
+    }
+
+    select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .options-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .options-row label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-transform: none;
+      letter-spacing: 0;
+      font-size: 13px;
+      color: var(--text);
+      cursor: pointer;
+      margin: 0;
+    }
+
+    input[type="checkbox"] {
+      accent-color: var(--accent);
+      width: 15px;
+      height: 15px;
+      cursor: pointer;
+    }
+
+    .output-card {
+      background: #111;
+      border: 1px solid var(--border2);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      margin-top: 1.5rem;
+    }
+
+    .output-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .output-label {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 500;
+    }
+
+    .copy-btn {
+      background: var(--accent);
+      color: #0f0f0f;
+      border: none;
+      border-radius: 6px;
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 16px;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+
+    .copy-btn:hover { opacity: 0.85; }
+    .copy-btn:active { transform: scale(0.97); }
+
+    pre {
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      word-break: break-all;
+      color: var(--accent);
+    }
+
+    .note {
+      margin-top: 12px;
+      font-size: 13px;
+      color: var(--muted);
+      min-height: 20px;
+    }
+
+    .note.warn { color: var(--red); }
+    .note.ok { color: var(--green); }
+
+    footer {
+      margin-top: 3rem;
+      font-size: 12px;
+      color: #444;
+      text-align: center;
+    }
+
+    @media (max-width: 540px) {
+      .two-col { grid-template-columns: 1fr; }
+      h1 { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="badge">PowerShell · yt-dlp</div>
+      <h1>Playlist <span>Command</span> Generator</h1>
+      <p class="subtitle">Paste a YouTube playlist link and get a ready-to-run PowerShell command.</p>
+    </header>
+
+    <div class="card">
+      <label for="url">YouTube playlist URL</label>
+      <input id="url" type="text" placeholder="https://www.youtube.com/playlist?list=..." oninput="generate()" />
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <label for="format">Format</label>
+        <select id="format" onchange="generate()">
+          <option value="mp3">MP3 (audio only)</option>
+          <option value="mp4">MP4 (video)</option>
+          <option value="m4a">M4A (audio only)</option>
+          <option value="webm">WebM (audio only)</option>
+        </select>
+      </div>
+      <div class="card">
+        <label for="quality">Quality (video only)</label>
+        <select id="quality" onchange="generate()">
+          <option value="best">Best available</option>
+          <option value="1080">1080p</option>
+          <option value="720">720p</option>
+          <option value="480">480p</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card">
+      <label for="outdir">Save location</label>
+      <input id="outdir" type="text" placeholder='C:\Users\YourName\Downloads' oninput="generate()" />
+    </div>
+
+    <div class="card">
+      <label for="ytdlp">yt-dlp.exe path</label>
+      <input id="ytdlp" type="text" placeholder='C:\Users\YourName\Desktop\yt-dlp.exe' oninput="generate()" />
+    </div>
+
+    <div class="card">
+      <label for="ffmpeg">ffmpeg bin folder path</label>
+      <input id="ffmpeg" type="text" placeholder='C:\ffmpeg\bin' oninput="generate()" />
+    </div>
+
+    <div class="card">
+      <label>Options</label>
+      <div class="options-row">
+        <label><input type="checkbox" id="numbered" onchange="generate()" checked /> Number files by playlist order</label>
+        <label><input type="checkbox" id="skip" onchange="generate()" checked /> Skip errors &amp; continue</label>
+        <label><input type="checkbox" id="overwrite" onchange="generate()" /> Force re-download existing</label>
+      </div>
+    </div>
+
+    <div class="output-card">
+      <div class="output-header">
+        <span class="output-label">PowerShell command</span>
+        <button class="copy-btn" id="copybtn" onclick="copyCmd()">Copy</button>
+      </div>
+      <pre id="output"></pre>
+      <p class="note" id="note"></p>
+    </div>
+
+    <footer>Built with yt-dlp · No data is sent anywhere · Runs entirely in your browser</footer>
+  </div>
+
+  <script>
+    function generate() {
+      const url = document.getElementById('url').value.trim();
+      const fmt = document.getElementById('format').value;
+      const quality = document.getElementById('quality').value;
+      const outdir = document.getElementById('outdir').value.trim();
+      const ytdlp = document.getElementById('ytdlp').value.trim();
+      const ffmpeg = document.getElementById('ffmpeg').value.trim();
+      const numbered = document.getElementById('numbered').checked;
+      const skip = document.getElementById('skip').checked;
+      const overwrite = document.getElementById('overwrite').checked;
+
+      const isAudio = ['mp3', 'm4a', 'webm'].includes(fmt);
+      const exe = ytdlp || 'yt-dlp.exe';
+
+      let parts = [`& "${exe}"`];
+
+      if (isAudio) {
+        parts.push(`-x --audio-format ${fmt}`);
+      } else {
+        const q = quality === 'best' ? 'bestvideo+bestaudio' : `bestvideo[height<=${quality}]+bestaudio`;
+        parts.push(`-f "${q}"`);
+      }
+
+      if (ffmpeg) parts.push(`--ffmpeg-location "${ffmpeg}"`);
+      if (overwrite) parts.push('--force-overwrites');
+      if (skip) parts.push('-i');
+
+      const template = numbered ? '%(playlist_index)s - %(title)s.%(ext)s' : '%(title)s.%(ext)s';
+      const outPath = outdir ? `${outdir}\\${template}` : template;
+      parts.push(`-o "${outPath}"`);
+      parts.push(`"${url || 'PASTE_PLAYLIST_URL_HERE'}"`);
+
+      document.getElementById('output').textContent = parts.join(' ');
+
+      const note = document.getElementById('note');
+      note.className = 'note';
+      if (!url) {
+        note.textContent = 'Paste a playlist URL above to complete the command.';
+      } else if (!url.includes('list=')) {
+        note.className = 'note warn';
+        note.textContent = "⚠ That doesn't look like a playlist URL — make sure it contains list= in the address.";
+      } else {
+        note.className = 'note ok';
+        note.textContent = '✓ Command ready — copy and paste into PowerShell.';
+      }
+    }
+
+    function copyCmd() {
+      const text = document.getElementById('output').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById('copybtn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy', 2000);
+      });
+    }
+
+    generate();
+  </script>
+</body>
+</html>
